@@ -44,53 +44,53 @@ function formatRecipe(data) {
 }
 
 /////////////////////////////////////////// need to check if this works
-router.get('/search', async (req, res, next) => {
-  try {
-    let { query, cuisine, diet, intolerances, number } = req.query;
-    console.log(req.query)
-        // Set the parameters for the API request
-    let params = {
-      query: query || '', // use the query param or default to an empty string
-      cuisine: cuisine || '',
-      diet: diet || '',
-      intolerances: intolerances || '',
-      number: number || 5, // default to 5 results if not specified
-      apiKey: process.env.spooncular_apiKey
-    };
-    // Construct the URL for the Spoonacular API
+// router.get('/search', async (req, res, next) => {
+//   try {
+//     let { query, cuisine, diet, intolerances, number } = req.query;
+//     console.log(req.query)
+//         // Set the parameters for the API request
+//     let params = {
+//       query: query || '', // use the query param or default to an empty string
+//       cuisine: cuisine || '',
+//       diet: diet || '',
+//       intolerances: intolerances || '',
+//       number: number || 5, // default to 5 results if not specified
+//       apiKey: process.env.spooncular_apiKey
+//     };
+//     // Construct the URL for the Spoonacular API
 
-    // Send the request to the Spoonacular API
-    let response = await axios.get('https://api.spoonacular.com/recipes/complexSearch', { params });
-    console.log(response.data)
-    // Retrieve the full details of each recipe
-    let detailedRecipes = [];
-    for(let recipe of response.data.results){
-      // console.log(recipe.id)
+//     // Send the request to the Spoonacular API
+//     let response = await axios.get('https://api.spoonacular.com/recipes/complexSearch', { params });
+//     console.log(response.data)
+//     // Retrieve the full details of each recipe
+//     let detailedRecipes = [];
+//     for(let recipe of response.data.results){
+//       // console.log(recipe.id)
 
-      let recipeDetails = await recipes_utils.getRecipeDetails(recipe.id);
-      // console.log(recipeDetails)
-///////////////////////////////////////////////////////////////////////////
-      detailedRecipes.push(recipeDetails);
-      // detailedRecipes.push(recipeDetails.data);
-///////////////////////////////////////////////////////////////////////////
+//       let recipeDetails = await recipes_utils.getRecipeDetails(recipe.id);
+//       // console.log(recipeDetails)
+// ///////////////////////////////////////////////////////////////////////////
+//       detailedRecipes.push(recipeDetails);
+//       // detailedRecipes.push(recipeDetails.data);
+// ///////////////////////////////////////////////////////////////////////////
 
-    }
-    console.log(detailedRecipes)
+//     }
+//     // console.log(detailedRecipes)
 
-    // Send the result back to the client
-    res.json(detailedRecipes);
+//     // Send the result back to the client
+//     res.json(detailedRecipes);
 
-} catch (error) {
-next(error);
-}
-});
+// } catch (error) {
+// next(error);
+// }
+// });
 
 
 router.get("/info", async (req, res, next) => {
   try {
     console.log("is here is the problem ??");
+    // console.log(req.body.recipeId);
     console.log(req.query.id);
-    console.log(req);
 
     const recipe = await recipes_utils.getRecipeAllInformation(req.query.id);
     console.log("recipe info:", recipe);
@@ -100,7 +100,6 @@ router.get("/info", async (req, res, next) => {
     next(error);
   }
 });
-
 
 
 /**

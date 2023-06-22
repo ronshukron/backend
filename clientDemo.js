@@ -39,11 +39,12 @@ const testServerFlow = async () => {
 
 
     // Fetch recipe details
-    // const recipeDetailId = 9999999;  // Replace with actual recipe id
-    // const params = { recipeId: recipeDetailId };
-    // let result = await axios.get(`http://localhost:80/recipes/info`, { params });
+    const recipeDetailId = 9999999;  // Replace with actual recipe id
+    const params = { id: recipeDetailId };
+    let result = await axios.get(`http://localhost:80/recipes/info`, { params });
     
-    // console.log("Recipe details:", result.data);
+    console.log("Recipe details:", result.data);
+
 
     const how_to_make_data = {
       name: "John Doe",
