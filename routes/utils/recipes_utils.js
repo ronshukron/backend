@@ -30,6 +30,7 @@ async function getRecipeDetailsFromDB(recipe_id) {
     // console.log("getRecipeDetailsFromDB recipe_id", recipe_details[0])
     console.log(recipe_details)
     const {
+        
         analyzedInstructions,
         instructions,
         how_to_make,
@@ -40,14 +41,14 @@ async function getRecipeDetailsFromDB(recipe_id) {
       } = recipe_details[0]; // Access the first result from the query
     
       return {
-        id: recipe_id,
-        analyzedInstructions,
-        instructions,
+        id : recipe_id,
+        analyzedInstructions: analyzedInstructions,
+        instructions: instructions,
         extendedIngredients: how_to_make,
         aggregateLikes: likes,
         readyInMinutes: time_to_make,
-        image,
-        title
+        image: image,
+        title: title
       };
 }
 
@@ -56,28 +57,8 @@ async function getRecipeDetailsFromDBfamily(recipe_id) {
 
     const recipe_details = await DButils.execQuery(`SELECT * FROM familyrecipes WHERE recipe_id='${recipe_id}'`);
 
-    console.log("getRecipeDetailsFromDB recipe_id", recipe_details[0])
-    const {
-        analyzedInstructions,
-        instructions,
-        how_to_make,
-        likes,
-        time_to_make,
-        image,
-        title
-      } = recipe_details[0]; // Access the first result from the query
-    
-      return {
-        id: recipe_id,
-        analyzedInstructions,
-        instructions,
-        extendedIngredients: how_to_make,
-        aggregateLikes: likes,
-        readyInMinutes: time_to_make,
-        image,
-        title
-      };
-    // return recipe_details[0];
+    // console.log("getRecipeDetailsFromDB recipe_id", recipe_details[0])
+    return recipe_details[0];
 }
 
 
@@ -141,7 +122,7 @@ async function getRecipesPreview(recipeIds) {
     // Loop over all recipe ids and fetch their details
     for (const id of recipeIds) {
         try {
-            const recipeDetails = await getRecipeDetails(id);
+            const recipeDetails = await getRecipeAllInformation(id);
             // console.log(recipeDetails)
             recipes.push(recipeDetails);
         } catch (error) {
@@ -153,26 +134,23 @@ async function getRecipesPreview(recipeIds) {
     return recipes;
 }
 
-//////////////////////////////////////////////////////////////////////////////// added
-async function getRecipesFamilyPreview(recipeIds) {
-    let recipes = [];
+// async function getRecipesPreview(recipeIds) {
+//     let recipes = [];
 
-    // Loop over all recipe ids and fetch their details
-    for (const id of recipeIds) {
-        try {
-            const recipeDetails = await getRecipeDetailsFromDBfamily(id);
-            // console.log(recipeDetails)
-            recipes.push(recipeDetails);
-        } catch (error) {
-            console.log(`Failed to get details for recipe with id ${id}`);
-            console.error(error);
-        }
-    }
+//     // Loop over all recipe ids and fetch their details
+//     for (const id of recipeIds) {
+//         try {
+//             const recipeDetails = await getRecipeDetails(id);
+//             // console.log(recipeDetails)
+//             recipes.push(recipeDetails);
+//         } catch (error) {
+//             console.log(`Failed to get details for recipe with id ${id}`);
+//             console.error(error);
+//         }
+//     }
 
-    return recipes;
-}
-///////////////////////////////////////////////////////////////////////////////
-
+//     return recipes;
+// }
 
 async function getRandomRecipes() {
     try {
@@ -199,51 +177,51 @@ async function getRandomRecipes() {
 async function getRecipeAllInformation(recipe_id) {
         console.log("i got herrrrrrrrrrrrrrrrrrrrrrrre!!!!!!")
         console.log(recipe_id)
-        let recipe_info = null;
+        let res = null;
         try{
-            recipe_info = await getRecipeDetailsFromDB(recipe_id);
-            return recipe_info;
+            res = await getRecipeDetailsFromDB(recipe_id);
+            return res;
         }
         catch{
             console.log(`Failed to get details for recipe with id ${recipe_id} from local database, checking API...`);
-            recipe_info = null;
+            res = null;
         }
-        if (recipe_info == null) {
-            try{
-                recipe_info = await axios.get(`${api_domain}/${recipe_id}/information`, {
-                    params: {
-                        includeNutrition: false,
-                        apiKey: process.env.spooncular_apiKey
-                    }
-                });
+        // if (res == null) {
+        //     try{
+        //         res = await axios.get(`${api_domain}/${recipe_id}/information`, {
+        //             params: {
+        //                 includeNutrition: false,
+        //                 apiKey: process.env.spooncular_apiKey
+        //             }
+        //         });
 
-                console.log(recipe_info.data)
+        //         console.log(res.data)
 
-                let {
-                    analyzedInstructions,
-                    instructions,
-                    extendedIngredients,
-                    aggregateLikes,
-                    readyInMinutes,
-                    image,
-                    title
-                } = res.data;
+        //         let {
+        //             analyzedInstructions,
+        //             instructions,
+        //             extendedIngredients,
+        //             aggregateLikes,
+        //             readyInMinutes,
+        //             image,
+        //             title
+        //         } = res.data;
 
-                return {
-                    analyzedInstructions: analyzedInstructions,
-                    instructions: instructions,
-                    extendedIngredients: extendedIngredients,
-                    aggregateLikes: aggregateLikes,
-                    readyInMinutes: readyInMinutes,
-                    image: image,
-                    title: title
-                }
-            }
-            catch(error){
-                console.error(`Failed to get details for recipe with id ${recipe_id} from API`);
-                throw error;
-            }
-        }
+        //         return {
+        //             analyzedInstructions: analyzedInstructions,
+        //             instructions: instructions,
+        //             extendedIngredients: extendedIngredients,
+        //             aggregateLikes: aggregateLikes,
+        //             readyInMinutes: readyInMinutes,
+        //             image: image,
+        //             title: title
+        //         }
+        //     }
+        //     catch(error){
+        //         console.error(`Failed to get details for recipe with id ${recipe_id} from API`);
+        //         throw error;
+        //     }
+        // }
     }
 
 exports.getRecipeAllInformation = getRecipeAllInformation;
@@ -251,6 +229,5 @@ exports.getRecipeDetails = getRecipeDetails;
 exports.getRecipesPreview = getRecipesPreview;
 exports.getRandomRecipes = getRandomRecipes;
 exports.getRecipeDetailsFromDBfamily = getRecipeDetailsFromDBfamily;
-exports.getRecipesFamilyPreview = getRecipesFamilyPreview;
 
 
