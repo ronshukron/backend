@@ -54,11 +54,38 @@ async function getRecipeDetailsFromDB(recipe_id) {
 
 async function getRecipeDetailsFromDBfamily(recipe_id) {
     // console.log("getRecipeDetailsFromDB recipe_id", recipe_id)
+    console.log("getRecipeDetailsFromDB")
+    console.log(recipe_id)
 
+    // console.log("getRecipeDetailsFromDB recipe_id", recipe_id)
     const recipe_details = await DButils.execQuery(`SELECT * FROM familyrecipes WHERE recipe_id='${recipe_id}'`);
-
     // console.log("getRecipeDetailsFromDB recipe_id", recipe_details[0])
-    return recipe_details[0];
+    console.log(recipe_details)
+    const {
+        
+        analyzedInstructions,
+        instructions,
+        how_to_make,
+        likes,
+        time_to_make,
+        image,
+        title
+      } = recipe_details[0]; // Access the first result from the query
+    
+      return {
+        id : recipe_id,
+        analyzedInstructions: analyzedInstructions,
+        instructions: instructions,
+        extendedIngredients: how_to_make,
+        aggregateLikes: likes,
+        readyInMinutes: time_to_make,
+        image: image,
+        title: title
+      };
+    // const recipe_details = await DButils.execQuery(`SELECT * FROM familyrecipes WHERE recipe_id='${recipe_id}'`);
+
+    // // console.log("getRecipeDetailsFromDB recipe_id", recipe_details[0])
+    // return recipe_details[0];
 }
 
 
@@ -186,42 +213,44 @@ async function getRecipeAllInformation(recipe_id) {
             console.log(`Failed to get details for recipe with id ${recipe_id} from local database, checking API...`);
             res = null;
         }
-        // if (res == null) {
-        //     try{
-        //         res = await axios.get(`${api_domain}/${recipe_id}/information`, {
-        //             params: {
-        //                 includeNutrition: false,
-        //                 apiKey: process.env.spooncular_apiKey
-        //             }
-        //         });
+        if (res == null) {
+            try{
+                res = await axios.get(`${api_domain}/${recipe_id}/information`, {
+                    params: {
+                        includeNutrition: false,
+                        apiKey: process.env.spooncular_apiKey
+                    }
+                });
 
-        //         console.log(res.data)
+                console.log(res.data)
 
-        //         let {
-        //             analyzedInstructions,
-        //             instructions,
-        //             extendedIngredients,
-        //             aggregateLikes,
-        //             readyInMinutes,
-        //             image,
-        //             title
-        //         } = res.data;
+                let {
+                    id,
+                    analyzedInstructions,
+                    instructions,
+                    extendedIngredients,
+                    aggregateLikes,
+                    readyInMinutes,
+                    image,
+                    title
+                } = res.data;
 
-        //         return {
-        //             analyzedInstructions: analyzedInstructions,
-        //             instructions: instructions,
-        //             extendedIngredients: extendedIngredients,
-        //             aggregateLikes: aggregateLikes,
-        //             readyInMinutes: readyInMinutes,
-        //             image: image,
-        //             title: title
-        //         }
-        //     }
-        //     catch(error){
-        //         console.error(`Failed to get details for recipe with id ${recipe_id} from API`);
-        //         throw error;
-        //     }
-        // }
+                return {
+                    id: id,
+                    analyzedInstructions: analyzedInstructions,
+                    instructions: instructions,
+                    extendedIngredients: extendedIngredients,
+                    aggregateLikes: aggregateLikes,
+                    readyInMinutes: readyInMinutes,
+                    image: image,
+                    title: title
+                }
+            }
+            catch(error){
+                console.error(`Failed to get details for recipe with id ${recipe_id} from API`);
+                throw error;
+            }
+        }
     }
 
 exports.getRecipeAllInformation = getRecipeAllInformation;

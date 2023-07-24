@@ -99,7 +99,7 @@ router.get('/familyrecepies', async (req,res,next) => {
     console.log(recipes_id)
     let recipes_id_array = [];
     recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into array
-    const results = await recipe_utils.getRecipesFamilyPreview(recipes_id_array);
+    const results = await recipe_utils.getRecipeDetailsFromDBfamily(recipes_id_array);
     console.log(results)
     res.status(200).send(results);
   } catch(error){
