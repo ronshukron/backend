@@ -36,6 +36,8 @@ async function getRecipeDetailsFromDB(recipe_id) {
         how_to_make,
         likes,
         time_to_make,
+        is_vegan,
+        is_gluten_free,
         image,
         title
       } = recipe_details[0]; // Access the first result from the query
@@ -47,38 +49,45 @@ async function getRecipeDetailsFromDB(recipe_id) {
         extendedIngredients: how_to_make,
         aggregateLikes: likes,
         readyInMinutes: time_to_make,
+        is_vegan: is_vegan,
+        is_gluten_free: is_gluten_free,
         image: image,
         title: title
       };
 }
 
-async function getRecipeDetailsFromDBfamily(recipe_id) {
+async function getRecipeDetailsFromDBfamily(recipe_id1) {
     // console.log("getRecipeDetailsFromDB recipe_id", recipe_id)
     console.log("getRecipeDetailsFromDB")
-    console.log(recipe_id)
+    console.log(recipe_id1)
 
     // console.log("getRecipeDetailsFromDB recipe_id", recipe_id)
-    const recipe_details = await DButils.execQuery(`SELECT * FROM familyrecipes WHERE recipe_id='${recipe_id}'`);
+    const recipe_details = await DButils.execQuery(`SELECT * FROM familyrecipes WHERE recipe_id='${recipe_id1}'`);
     // console.log("getRecipeDetailsFromDB recipe_id", recipe_details[0])
-    console.log(recipe_details)
-    const {
-        
+    console.log("recipe_details", recipe_details)
+    let {
+        recipe_id,
         analyzedInstructions,
         instructions,
         how_to_make,
         likes,
         time_to_make,
+        is_vegan,
+        is_gluten_free,
         image,
         title
       } = recipe_details[0]; // Access the first result from the query
-    
+      analyzedInstructions = ["make at home, 10 cups of salt"]
+      instructions = "glass melted, 15 cups of salt"
       return {
-        id : recipe_id,
+        id :  recipe_id,
         analyzedInstructions: analyzedInstructions,
         instructions: instructions,
         extendedIngredients: how_to_make,
         aggregateLikes: likes,
         readyInMinutes: time_to_make,
+        is_vegan: is_vegan,
+        is_gluten_free: is_gluten_free,
         image: image,
         title: title
       };
@@ -143,6 +152,25 @@ async function getRecipeDetails(recipe_id) {
 }
 
 
+async function getRecipesPreviewFamily(recipeIds) {
+    let recipes = [];
+
+    // Loop over all recipe ids and fetch their details
+    for (const id of recipeIds) {
+        try {
+            const recipeDetails = await getRecipeDetailsFromDBfamily(id);
+            // console.log(recipeDetails)
+            recipes.push(recipeDetails);
+        } catch (error) {
+            console.log(`Failed to get details for recipe with id ${id}`);
+            // console.error(error);
+        }
+    }
+
+    return recipes;
+}
+
+
 async function getRecipesPreview(recipeIds) {
     let recipes = [];
 
@@ -154,7 +182,7 @@ async function getRecipesPreview(recipeIds) {
             recipes.push(recipeDetails);
         } catch (error) {
             console.log(`Failed to get details for recipe with id ${id}`);
-            console.error(error);
+            // console.error(error);
         }
     }
 
@@ -210,8 +238,18 @@ async function getRecipeAllInformation(recipe_id) {
             return res;
         }
         catch{
-            console.log(`Failed to get details for recipe with id ${recipe_id} from local database, checking API...`);
+            console.log(`Failed to get details for recipe with id ${recipe_id} from local database, checking Family...`);
             res = null;
+        }
+        if (res == null) {
+            try{
+                res = await getRecipeDetailsFromDBfamily(recipe_id);
+                return res;
+            }
+            catch{
+                console.log(`Failed to get details for recipe with id ${recipe_id} from local database, checking API...`);
+                res = null;
+            }
         }
         if (res == null) {
             try{
@@ -231,6 +269,8 @@ async function getRecipeAllInformation(recipe_id) {
                     extendedIngredients,
                     aggregateLikes,
                     readyInMinutes,
+                    is_vegan,
+                    is_gluten_free,
                     image,
                     title
                 } = res.data;
@@ -242,6 +282,8 @@ async function getRecipeAllInformation(recipe_id) {
                     extendedIngredients: extendedIngredients,
                     aggregateLikes: aggregateLikes,
                     readyInMinutes: readyInMinutes,
+                    is_vegan: is_vegan,
+                    is_gluten_free: is_gluten_free,
                     image: image,
                     title: title
                 }
@@ -258,5 +300,5 @@ exports.getRecipeDetails = getRecipeDetails;
 exports.getRecipesPreview = getRecipesPreview;
 exports.getRandomRecipes = getRandomRecipes;
 exports.getRecipeDetailsFromDBfamily = getRecipeDetailsFromDBfamily;
-
+exports.getRecipesPreviewFamily = getRecipesPreviewFamily;
 
